@@ -1,10 +1,43 @@
 import { Search } from "lucide-react";
 import RecipeCard from "../components/RecipeCard";
+import { useEffect, useState } from "react";
+import { getRandomColor } from "../lib/utils";
 
+const APP_ID = import.meta.env.VITE_APP_ID;
+const APP_KEY = import.meta.env.VITE_APP_KEY;
 
 const HomePage = () => {
-  return (
-    <div className='bg-[#faf9fb] p-10 flex-1'>
+	const [recipes, setRecipes] = useState([]);
+	const [loading, setLoading] = useState(true);
+
+	const fetchRecipes = async (searchQuery) => {
+		setLoading(true);
+		setRecipes([]);
+		try {
+			const res = await fetch(
+				`https://api.edamam.com/api/recipes/v2/?app_id=${APP_ID}&app_key=${APP_KEY}&q=${searchQuery}&type=public`
+			);
+			const data = await res.json();
+			setRecipes(data.hits);
+			console.log(data.hits);
+		} catch (error) {
+			console.log(error.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		fetchRecipes("chicken");
+	}, []);
+
+	const handleSearchRecipe = (e) => {
+		e.preventDefault();
+		fetchRecipes(e.target[0].value);
+	};
+
+	return (
+		<div className='bg-[#faf9fb] p-10 flex-1'>
 			<div className='max-w-screen-lg mx-auto'>
 				<form onSubmit={handleSearchRecipe}>
 					<label className='input shadow-md flex items-center gap-2'>
@@ -41,7 +74,5 @@ const HomePage = () => {
 			</div>
 		</div>
 	);
-  
-}
-
+};
 export default HomePage;

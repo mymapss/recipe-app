@@ -1,8 +1,31 @@
 import { Heart, HeartPulse, Soup } from "lucide-react";
+import { useState } from "react";
 
-const RecipeCard = () => {
-  return (
-    <div className={`flex flex-col rounded-md ${bg} overflow-hidden p-3 relative`}>
+const getTwoValuesFromArray = (arr) => {
+	return [arr[0], arr[1]];
+};
+
+const RecipeCard = ({ recipe, bg, badge }) => {
+	const healthLabels = getTwoValuesFromArray(recipe.healthLabels);
+	const [isFavorite, setIsFavorite] = useState(localStorage.getItem("favorites")?.includes(recipe.label));
+
+	const addRecipeToFavorites = () => {
+		let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+		const isRecipeAlreadyInFavorites = favorites.some((fav) => fav.label === recipe.label);
+
+		if (isRecipeAlreadyInFavorites) {
+			favorites = favorites.filter((fav) => fav.label !== recipe.label);
+			setIsFavorite(false);
+		} else {
+			favorites.push(recipe);
+			setIsFavorite(true);
+		}
+
+		localStorage.setItem("favorites", JSON.stringify(favorites));
+	};
+
+	return (
+		<div className={`flex flex-col rounded-md ${bg} overflow-hidden p-3 relative`}>
 			<a
 				href={`https://www.youtube.com/results?search_query=${recipe.label} recipe`}
 				target='_blank'
@@ -54,7 +77,6 @@ const RecipeCard = () => {
 				))}
 			</div>
 		</div>
-  )
-}
-
-export default RecipeCard
+	);
+};
+export default RecipeCard;
